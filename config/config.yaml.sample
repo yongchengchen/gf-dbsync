@@ -1,0 +1,19 @@
+# Logger configurations.
+localmode: true
+pempath: ""
+
+redis:
+  default:
+    address: 127.0.0.1:6379
+    db: 0
+
+database:
+  sqlite:
+    type: "sqlite3"
+    link: "~/.gf-dbsync/config/sqlite.db"
+    debug: true
+    # 数据库日志对象配置
+    logger:
+        Path: "/tmp/log/wssshjumper/sql"
+        Level:  "all"
+        Stdout: true
