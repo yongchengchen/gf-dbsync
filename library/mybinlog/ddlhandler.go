@@ -44,11 +44,18 @@ func (h *eventHandler) handelDDLByStmt(curDB string, stmt ast.StmtNode, header *
 func (h *eventHandler) handleRenameTable(curDB string, t *ast.RenameTableStmt) {
 	for _, tableInfo := range t.TableToTables {
 		db := tableInfo.NewTable.Schema.String()
+		if len(db) == 0 {
+			db = curDB
+		}
 		tbl := tableInfo.NewTable.Name.String()
 		k := ruleKey(db, tbl)
+		fmt.Printf("rename table %s %s\n", db, tbl)
 		if rule, ok := h.r.rules[k]; ok {
 			//there's a table renamed as current exists rule's table
-			h.r.DumpTable(db, tbl, rule.ToDBServer)
+			if f, ok := h.r.DumpTable(db, tbl); ok == nil {
+				h.r.dumper.ImportSql(f, rule.ToDBServer, rule.ToDB)
+				h.r.updateRule(db, tbl)
+			}
 		}
 	}
 }

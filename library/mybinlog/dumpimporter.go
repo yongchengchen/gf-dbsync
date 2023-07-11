@@ -7,9 +7,11 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/gogf/gf/v2/frame/g"
 )
 
-func (d *MyDumper) ParseAndImport(sqlFilePath string) {
+func (d *MyDumper) ImportSql(sqlFilePath string, toServer string, toDB string) {
 	// Read the SQL file
 	file, err := os.Open(sqlFilePath)
 	if err != nil {
@@ -87,10 +89,28 @@ func (d *MyDumper) ParseAndImport(sqlFilePath string) {
 
 	// Execute the MySQL command to perform further actions with the extracted values
 	// cmd := exec.Command("mysql", "-u", "yourusername", "-pYourPassword", "-e", fmt.Sprintf(`USE Test1; CHANGE MASTER TO MASTER_LOG_FILE='%s', MASTER_LOG_POS=%s;`, masterLogFile, masterLogPos))
-	cmd := exec.Command("mysql", "-u", "yourusername", "-pYourPassword", "yourdatabasename", "<", outputFilePath)
+
+	c := g.DB(toServer).GetConfig()
+	// args := make([]string, 0, 16)
+	// args = append(args, fmt.Sprintf(" -u%s", c.User))
+	// args = append(args, fmt.Sprintf(" -p%s", c.Pass))
+	// args = append(args, fmt.Sprintf(" -h %s", c.Host))
+	// args = append(args, fmt.Sprintf(" -P %s", c.Port))
+	// args = append(args, fmt.Sprintf(" < %s", outputFilePath))
+	// cmd := exec.Command(d.ExecutionPath, args...)
+
+	cmd := exec.Command("mysql",
+		"-u", c.User,
+		"-p"+c.Pass,
+		"-h", c.Host,
+		"-P", c.Port,
+		"-D", toDB,
+		"-e", "source "+outputFilePath,
+	)
 	err = cmd.Run()
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal(err)
 	}
-
+	os.Remove(outputFilePath)
 }

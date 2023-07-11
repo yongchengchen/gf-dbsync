@@ -119,7 +119,7 @@ func (r *PipeLine) prepareCanal() error {
 	return nil
 }
 
-func (p *PipeLine) DumpTable(db string, table string, toDB string) (string, error) {
+func (p *PipeLine) DumpTable(db string, table string) (string, error) {
 	fmt.Printf("dump table data: %s %s\n", db, table)
 	p.dumper.Reset()
 	p.dumper.AddTables(db, table)
@@ -137,7 +137,7 @@ func (p *PipeLine) DumpTable(db string, table string, toDB string) (string, erro
 
 	// defer close(p.dumper.dumpDoneCh)
 	fmt.Printf("dump table data: %s %s\n", db, table)
-	return tmpFile, p.dumper.Dump(f, toDB)
+	return tmpFile, p.dumper.Dump(f)
 }
 
 func (r *PipeLine) newRule(db string, table string) error {

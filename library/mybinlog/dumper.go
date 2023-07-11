@@ -155,7 +155,7 @@ func (d *MyDumper) Reset() {
 	d.Where = ""
 }
 
-func (d *MyDumper) Dump(w io.Writer, toDB string) error {
+func (d *MyDumper) Dump(w io.Writer) error {
 	args := make([]string, 0, 16)
 
 	// Common args
@@ -188,7 +188,7 @@ func (d *MyDumper) Dump(w io.Writer, toDB string) error {
 	}
 
 	args = append(args, "--single-transaction")
-	args = append(args, "--skip-lock-tables")
+	// args = append(args, "--skip-lock-tables")
 
 	// Disable uncessary data
 	args = append(args, "--compact")
@@ -198,6 +198,8 @@ func (d *MyDumper) Dump(w io.Writer, toDB string) error {
 
 	// We only care about data
 	// args = append(args, "--no-create-info")
+
+	args = append(args, "--add-drop-table")
 
 	// Multi row is easy for us to parse the data
 	args = append(args, "--skip-extended-insert")
@@ -241,13 +243,13 @@ func (d *MyDumper) Dump(w io.Writer, toDB string) error {
 		// If we only dump some tables, the dump data will not have database name
 		// which makes us hard to parse, so here we add it manually.
 
-		if len(toDB) == 0 {
-			toDB = d.TableDB
-		}
-		_, err := w.Write([]byte(fmt.Sprintf("USE `%s`;\n", toDB)))
-		if err != nil {
-			return fmt.Errorf(`could not write USE command: %w`, err)
-		}
+		// if len(toDB) == 0 {
+		// 	toDB = d.TableDB
+		// }
+		// _, err := w.Write([]byte(fmt.Sprintf("USE `%s`;\n", toDB)))
+		// if err != nil {
+		// 	return fmt.Errorf(`could not write USE command: %w`, err)
+		// }
 	}
 
 	args[passwordArgIndex] = "--password=******"
